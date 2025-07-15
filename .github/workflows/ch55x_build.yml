@@ -1,43 +1,29 @@
-name: Build CH555 QMK Firmware
+name: CH555 Firmware Build
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install SDCC
+      - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y sdcc
-          sdcc --version
+          sudo apt-get update
+          sudo apt-get install -y sdcc make ripgrep
 
-      - name: Make build directory manually
-        run: |
-          mkdir -p .build/obj_reccarz_kw75s_default
-
-      - name: Run compile.sh
-        run: |
-          chmod +x compile.sh
-          ./compile.sh reccarz/kw75s default || true
+      - name: Run compile script
+        run: bash ./compile.sh reccarz/kw75s default
 
       - name: Upload firmware artifacts
-        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ch555_firmware
+          name: ch555-firmware
           path: |
-            reccarz_kw75s_default.hex
-            reccarz_kw75s_default.bin
-
-      - name: Notify if build likely failed
-        if: success() || failure()
-        run: |
-          if [ ! -f reccarz_kw75s_default.hex ]; then
-            echo "⚠️ Build finished but hex file is missing."
-            exit 1
-          fi
+            *.hex
+            *.bin
