@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install SDCC
@@ -19,10 +19,12 @@ jobs:
       - name: Run compile.sh for reccarz/kw75s
         run: ./compile.sh reccarz/kw75s default
 
-      - name: Upload Firmware Files
-        uses: actions/upload-artifact@v3
+      - name: Upload release with firmware
+        uses: ncipollo/release-action@v1
         with:
-          name: reccarz-kw75s-firmware
-          path: |
+          tag: reccarz-latest
+          artifacts: |
             reccarz_kw75s_default.hex
             reccarz_kw75s_default.bin
+          token: ${{ secrets.GH_TOKEN }}
+          allowUpdates: true
